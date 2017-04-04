@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#f0f0f0"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/fl_tip1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#fff">
+
+            <TextView
+                android:id="@+id/tv_tip1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawablePadding="7dp"
+                android:drawableRight="@drawable/draw_main_text_filter"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingRight="5dp"
+                android:text="地区"
+                android:textColor="@color/color_main_text_filter"
+                android:textSize="13dp" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_tip2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="1px"
+            android:layout_weight="1"
+            android:background="#fff">
+
+            <TextView
+                android:id="@+id/tv_tip2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawablePadding="7dp"
+                android:drawableRight="@drawable/draw_main_text_filter"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingRight="5dp"
+                android:text="职位"
+                android:textColor="@color/color_main_text_filter"
+                android:textSize="13dp" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_tip3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="1px"
+            android:layout_weight="1"
+            android:background="#fff">
+
+            <TextView
+                android:id="@+id/tv_tip3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawablePadding="7dp"
+                android:drawableRight="@drawable/draw_main_text_filter"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingRight="5dp"
+                android:text="经验"
+                android:textColor="@color/color_main_text_filter"
+                android:textSize="13dp" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_tip4"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="1px"
+            android:layout_weight="1"
+            android:background="#fff"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tv_tip4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawablePadding="7dp"
+                android:drawableRight="@drawable/draw_main_text_filter"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingRight="5dp"
+                android:text="标题4"
+                android:textColor="@color/color_main_text_filter"
+                android:textSize="13dp" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#f0f0f0" />
+
+    <FrameLayout
+        android:id="@+id/fl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#7f000000" />
+
+        <ListView
+            android:id="@+id/lv_filter_single"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#fff" />
+
+        <LinearLayout
+            android:id="@+id/ll_content"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="#fff"
+            android:orientation="horizontal">
+
+            <ListView
+                android:id="@+id/lv_filter_city"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:scrollbars="none" />
+
+            <View
+                android:layout_width="1px"
+                android:layout_height="match_parent"
+                android:background="#f0f0f0" />
+
+            <ListView
+                android:id="@+id/lv_filter_area"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>
