@@ -5,13 +5,17 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.lvfq.homepage_master.adapter.ListViewBaseAdapter;
 import com.lvfq.homepage_master.impl.IAreaCallBack;
 import com.lvfq.homepage_master.impl.IFilterCallBack;
 import com.lvfq.homepage_master.impl.OnScrollChangedListener;
@@ -19,23 +23,29 @@ import com.lvfq.homepage_master.util.DPUtil;
 import com.lvfq.homepage_master.util.V;
 import com.lvfq.homepage_master.view.CusScrollView;
 import com.lvfq.homepage_master.view.FilterView;
-import com.lvfq.homepage_master.view.MaxListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.lvfq.homepage_master.util.DPUtil.dip2px;
 
-public class MainActivity extends FragmentActivity {
+/**
+ * RecyclerViewScrollActivity
+ *
+ * @author lvfq
+ * @date 2017/4/12 下午1:50
+ * @mainFunction :
+ */
 
+public class RecyclerViewScrollActivity extends FragmentActivity {
 
     private FilterView filterView;
     private CusScrollView cus_scroll_view;
-    private MaxListView main_max_listview;
+    private RecyclerView recyclerView;
     private LinearLayout ll_list_parent;
     private LinearLayout ll_toolbar;
 
-    private ListViewBaseAdapter<String> mAdapter;
+    private RecyclerViewBaseAdapter mAdapter;
 
     private String strArea = "初始值"; // 选择区域
     private String strPosition = "初始值"; // 选择职位
@@ -52,9 +62,10 @@ public class MainActivity extends FragmentActivity {
     private ProgressDialog mProgressDialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_recyclerview_scroll);
+
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage("加载中...");
         mProgressDialog.setCancelable(false);
@@ -63,13 +74,12 @@ public class MainActivity extends FragmentActivity {
         initBanner();
         initData();
         initAdapter();
-
     }
 
     private void initView() {
         filterView = V.find(this, R.id.main_filter);
         cus_scroll_view = V.find(this, R.id.cus_scroll_view);
-        main_max_listview = V.find(this, R.id.main_max_listview);
+        recyclerView = V.find(this, R.id.recyclerview);
         ll_list_parent = V.find(this, R.id.ll_list_parent);
         ll_toolbar = V.find(this, R.id.ll_toolbar);
 
@@ -161,10 +171,10 @@ public class MainActivity extends FragmentActivity {
             public void onGlobalLayout() {
                 int screenHeight = getResources().getDisplayMetrics().heightPixels;
 
-                int statusHeight = DPUtil.getStatusBarHeight(MainActivity.this);    // 状态栏高度，像素
+                int statusHeight = DPUtil.getStatusBarHeight(RecyclerViewScrollActivity.this);    // 状态栏高度，像素
                 initY = (int) ll_list_parent.getY();
 
-                int minHeight = screenHeight - dip2px(MainActivity.this, toolBarHeight + filterHeight) - statusHeight;
+                int minHeight = screenHeight - dip2px(RecyclerViewScrollActivity.this, toolBarHeight + filterHeight) - statusHeight;
                 ll_list_parent.setMinimumHeight(minHeight);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                     ll_list_parent.getViewTreeObserver().removeOnGlobalLayoutListener(this);
@@ -177,7 +187,7 @@ public class MainActivity extends FragmentActivity {
         cus_scroll_view.setOnScrollChangedListener(new OnScrollChangedListener() {
             @Override
             public void onScrollChanged(CusScrollView scrollView, int x, int y, int oldx, int oldy) {
-                int bannerHeight = DPUtil.dip2px(MainActivity.this, 180 - toolBarHeight);  // 180 是 布局里面写死的 banner 高度。
+                int bannerHeight = dip2px(RecyclerViewScrollActivity.this, 180 - toolBarHeight);  // 180 是 布局里面写死的 banner 高度。
                 if (y > bannerHeight) {
                     ll_toolbar.setBackgroundColor(Color.argb((int) 255, 255, 122, 122));    // 给定的一个颜色值
                 } else {
@@ -191,7 +201,7 @@ public class MainActivity extends FragmentActivity {
                 }
 
                 // 控制筛选条件是否显示。
-                int optionHeight = DPUtil.dip2px(MainActivity.this, 80);    // 80 是界面中 模拟占位区域的高度。
+                int optionHeight = dip2px(RecyclerViewScrollActivity.this, 80);    // 80 是界面中 模拟占位区域的高度。
                 if (y >= bannerHeight + optionHeight - filterHeight - toolBarHeight) {
                     filterView.setVisibility(View.VISIBLE);
                 } else {
@@ -207,7 +217,7 @@ public class MainActivity extends FragmentActivity {
      * 定位列表到第一条
      */
     private void resetRefreshLocal() {
-        int offset = dip2px(this, filterHeight + toolBarHeight);   // 84  是 toolbar + 筛选条件的布局高度
+        int offset = DPUtil.dip2px(this, filterHeight + toolBarHeight);   // 84  是 toolbar + 筛选条件的布局高度
         cus_scroll_view.scrollTo(0, initY - offset);// 设置 scrollView 滚动到某一个点，
     }
 
@@ -221,52 +231,10 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void initAdapter() {
-        mAdapter = new ListViewBaseAdapter<String>(this, R.layout.item_main_listview, testList) {
-            @Override
-            public void convert(int position, String item) {
-                TextView tv_index = f(R.id.tv_item_index);
-                TextView tv_position = f(R.id.tv_item_position);
-                TextView tv_area = f(R.id.tv_item_area);
-                TextView tv_exp = f(R.id.tv_item_exp);
 
-                tv_index.setText((position + 1) + "");
-                tv_position.setText(strPosition);
-                tv_exp.setText(strExp);
-                tv_area.setText(strArea);
-                if (position == list.size() - 1 && list.size() < 20) {
-                    itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showProgress();
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        Thread.sleep(1000);
-                                        runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                dismissProgress();
-                                                addModel(testList.size(), 10);
-                                                notifyDataSetChanged();
-                                            }
-                                        });
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                }
-                            }).start();
-
-                        }
-                    });
-                } else {
-                    itemView.setOnClickListener(null);
-                }
-
-            }
-        };
-        main_max_listview.setAdapter(mAdapter);
+        mAdapter = new RecyclerViewBaseAdapter(testList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(mAdapter);
     }
 
     /**
@@ -290,6 +258,80 @@ public class MainActivity extends FragmentActivity {
     private void dismissProgress() {
         if (mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
+        }
+    }
+
+    public class RecyclerViewBaseAdapter extends RecyclerView.Adapter<RecyclerViewBaseAdapter.ViewHolder> {
+
+        private List<String> list;
+
+        public RecyclerViewBaseAdapter(List<String> list) {
+            this.list = list;
+        }
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_main_listview, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(ViewHolder holder, int position) {
+            holder.tv_index.setText((position + 1) + "");
+            holder.tv_position.setText(strPosition);
+            holder.tv_exp.setText(strExp);
+            holder.tv_area.setText(strArea);
+            if (position == list.size() - 1 && list.size() < 20) {
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showProgress();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(1000);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            dismissProgress();
+                                            addModel(testList.size(), 10);
+                                            notifyDataSetChanged();
+                                        }
+                                    });
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }).start();
+
+                    }
+                });
+            } else {
+                holder.itemView.setOnClickListener(null);
+            }
+
+        }
+
+        @Override
+        public int getItemCount() {
+            return list.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+
+            private TextView tv_index;
+            private TextView tv_position;
+            private TextView tv_area;
+            private TextView tv_exp;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                tv_index = V.find(itemView, R.id.tv_item_index);
+                tv_position = V.find(itemView, R.id.tv_item_position);
+                tv_area = V.find(itemView, R.id.tv_item_area);
+                tv_exp = V.find(itemView, R.id.tv_item_exp);
+            }
         }
     }
 
